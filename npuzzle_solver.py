@@ -30,6 +30,7 @@ def parse_input():
 	# print(f"PARSE")
 	# tic = time.time()
 	board = []
+	size = int(file[0].split(' ')[0])
 	for f in file[1:]:
 		tab = f.split(' ')
 		for t in tab:
@@ -38,11 +39,10 @@ def parse_input():
 	# exit()
 
 	# TODO check if board is valid
-	# puzzle_size = file[0].split(' ')[0]
 	# if board_is_valid(board, puzzle_size) == False:
 	# 	error('invalid')
 
-	return tuple(board)
+	return size, tuple(board)
 
 
 def error(name):
@@ -69,12 +69,13 @@ def generate_board():
 
 def main():
 	if 1 <= len(sys.argv) <= 2:
-		if len(sys.argv) == 1:
-			initial_state = generate_board()
-		else:
-			initial_state = parse_input()
+		# TODO board generation
+		# if len(sys.argv) == 1:
+		# 	initial_state = generate_board()
+		# else:
+		size, initial_state = parse_input()
 		
-		constant.define_goal_state(len(initial_state))
+		constant.define_goal_state(size)
 		
 		if puzzle_is_solvable(initial_state):
 			tic = time.time()
