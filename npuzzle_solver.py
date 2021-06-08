@@ -34,7 +34,7 @@ def parse_input():
 	for f in file[1:]:
 		tab = f.split(' ')
 		for t in tab:
-			board.append(t)
+			board.append(int(t))
 	# print(f'{tuple(board)}\n{(time.time() - tic) * 1000}')
 	# exit()
 
@@ -76,19 +76,17 @@ def main():
 		size, initial_state = parse_input()
 		
 		constant.define_goal_state(size)
-		
-		if puzzle_is_solvable(initial_state):
+
+		# TODO check if puzzle is solvable
+		# if puzzle_is_solvable(initial_state):
+		if True:				# to be deleted
 			tic = time.time()
+
 			path = solve(initial_state)
-			# for p in path:
-			# 	print (p.state)
-			# print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-			# for p in path:
-			# 	print(p)
-			# print(path[-1].state)
+
 			print('solver', time.time() - tic)
-		else:
-			error('unsolvable')
+		# else:
+		# 	error('unsolvable')
 	else:
 		error('usage')
 

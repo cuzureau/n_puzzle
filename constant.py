@@ -6,7 +6,9 @@ def define_goal_state(length):
 
 	global GOAL_STATE
 	global BOARD_LENGTH
-	
+	global EMPTY_TILE
+	global NUMBER_OF_TILES
+
 	m = [[0] * length for i in range(length)]
 	dx, dy = [0, 1, 0, -1], [1, 0, -1, 0]
 	x, y, c = 0, -1, 1
@@ -23,5 +25,7 @@ def define_goal_state(length):
 
 	GOAL_STATE = tuple(n)
 	BOARD_LENGTH = length
+	EMPTY_TILE = 0
+	NUMBER_OF_TILES = length * length
 
 	# print('goal_state', time.time() - tic)
