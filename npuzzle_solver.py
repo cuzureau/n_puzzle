@@ -24,19 +24,25 @@ def parse_input():
 	except:
 		error('open')
 
-	board = []
-	puzzle_size = 0
-	for f in file:
-		if f.strip().isdigit():
-			if puzzle_size == 0:
-				puzzle_size = int(f.strip())
-		elif "".join(f.split()).isdigit():
-			board.append([int(value) for value in f.split()])
-	
-	if board_is_valid(board, puzzle_size) == False:
-		error('invalid')
+	file = [line.strip().split('#')[0] for line in file] 	# remove comments
+	file = [line for line in file if len(line) > 0]			# remove empty lines
 
-	return board
+	# print(f"PARSE")
+	# tic = time.time()
+	board = []
+	for f in file[1:]:
+		tab = f.split(' ')
+		for t in tab:
+			board.append(t)
+	# print(f'{tuple(board)}\n{(time.time() - tic) * 1000}')
+	# exit()
+
+	# TODO check if board is valid
+	# puzzle_size = file[0].split(' ')[0]
+	# if board_is_valid(board, puzzle_size) == False:
+	# 	error('invalid')
+
+	return tuple(board)
 
 
 def error(name):
@@ -67,7 +73,6 @@ def main():
 			initial_state = generate_board()
 		else:
 			initial_state = parse_input()
-			initial_state = np.array(initial_state)
 		
 		constant.define_goal_state(len(initial_state))
 		
