@@ -25,12 +25,32 @@ def manhattan_heuristic(state):
     return distance
 
 
-def nextnodes(state):
-    res = []
-    y = state.index(constant.EMPTY_TILE)
+def clone_and_swap(data,y0,y1):
+    clone = list(data)
+    tmp = clone[y0]
+    clone[y0] = clone[y1]
+    clone[y1] = tmp
+    return tuple(clone)
 
-    print(y)
-    exit()
+def nextnodes(data):
+    res = []
+    y = data.index(constant.EMPTY_TILE)
+    size = constant.BOARD_LENGTH
+
+    if y % size - 1 >= 0:
+        left = clone_and_swap(data,y,y-1)
+        res.append(left)
+    if y % size + 1 < size:
+        right = clone_and_swap(data,y,y+1)
+        res.append(right)
+    if y - size >= 0:
+        up = clone_and_swap(data,y,y-size)
+        res.append(up)
+    if y + size < constant.NUMBER_OF_TILES:
+        down = clone_and_swap(data,y,y+size)
+        res.append(down)
+
+    return res
 
 
 def search(path, g, threshold):

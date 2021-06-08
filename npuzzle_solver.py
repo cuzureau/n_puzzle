@@ -1,3 +1,4 @@
+import re
 import sys
 from solvability import puzzle_is_solvable
 from solver import solve
@@ -30,11 +31,11 @@ def parse_input():
 	# print(f"PARSE")
 	# tic = time.time()
 	board = []
-	size = int(file[0].split(' ')[0])
-	for f in file[1:]:
-		tab = f.split(' ')
-		for t in tab:
-			board.append(int(t))
+	size = int(file[0][0])		# TODO max size should be 9
+	for fi in file[1:]:
+		fi = re.findall('[0-9]+', fi)
+		for f in fi:
+			board.append(int(f))
 	# print(f'{tuple(board)}\n{(time.time() - tic) * 1000}')
 	# exit()
 
