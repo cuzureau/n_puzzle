@@ -1,26 +1,3 @@
-import numpy as np
-import constant
-import time
-
-
-
-# to be deleted for import
-def manhattan_distance(a, b):
-	return abs(b[0] - a[0]) + abs(b[1] - a[1])
-
-
-def manhattan_heuristic(state):
-	# tic = time.time()
-	# print(f"MANHATTAN2")
-	# print(f"--> STATE = {state}")
-	distance = 0
-
-	for key,value in state.items():
-		if key != constant.GLOBAL_STATE_DICT[value] and value != 0: # si possible enlever le zero
-			distance += manhattan_distance(key, constant.GLOBAL_STATE_DICT[value])
-	# print('MANHATTAN2', (time.time() - tic) * 1000)
-	return distance
-
 
 # J'en suis la : ca rame ! reste a tester avec l'ancien linear_conflicts tout en gardant le double : test_state (dict) et state (numpy array). Pour voir si le probleme vient de l'utilisation de ces deux la simultanement ou bien si c'est mon implementation de linear conflicts qui rame (ou bug ?)
 

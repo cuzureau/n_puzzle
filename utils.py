@@ -1,10 +1,7 @@
-import time
 import numpy as np
-import constant
 
 # a verifier
 def is_even(number):
-	# print('hey', number % 2)
 	return number % 2
 
 def count_transpositions(state1, state2):

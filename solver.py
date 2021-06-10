@@ -1,95 +1,87 @@
+from collections import deque
 from utils import count_distance
 from utils import manhattan_distance
 import numpy as np
-import constant
-import time
 from test2 import linear_conflict_heuristic
 
 
-def manhattan_heuristic(state):
-    # tic = time.time()
-    # print(f"MANHATTAN2")
-    # print(f"--> STATE = {state}")
-
+def manhattan_heuristic(state, goal_state, number_of_tiles, size):
     distance = 0
-    for i in range(constant.NUMBER_OF_TILES):
-        if state[i] != 0 and state[i] != constant.GOAL_STATE[i]:
-            ci = constant.GOAL_STATE.index(state[i])
-            y = (i // constant.BOARD_LENGTH) - (ci // constant.BOARD_LENGTH)
-            x = (i % constant.BOARD_LENGTH) - (ci % constant.BOARD_LENGTH)
+    for i in range(number_of_tiles):
+        if state[i] != goal_state[i] and state[i] != 0:
+            ci = goal_state.index(state[i])
+            y = (i // size) - (ci // size)
+            x = (i % size) - (ci % size)
             distance += abs(y) + abs(x)
-
-    # print('MANHATTAN2', (time.time() - tic) * 1000)
-    # exit()
 
     return distance
 
 
-def clone_and_swap(data,y0,y1):
+def clone_and_swap(data, y0, y1):
     clone = list(data)
     tmp = clone[y0]
     clone[y0] = clone[y1]
     clone[y1] = tmp
     return tuple(clone)
 
-def nextnodes(data):
-    res = []
-    y = data.index(constant.EMPTY_TILE)
-    size = constant.BOARD_LENGTH
 
-    if y % size - 1 >= 0:
-        left = clone_and_swap(data,y,y-1)
-        res.append(left)
+def nextnodes(state, number_of_tiles, size, y):
+    res = []
+
+    if y % size > 0:
+        left = clone_and_swap(state, y, y - 1)
+        res.append((left, y - 1))
     if y % size + 1 < size:
-        right = clone_and_swap(data,y,y+1)
-        res.append(right)
+        right = clone_and_swap(state, y, y + 1)
+        res.append((right, y + 1))
     if y - size >= 0:
-        up = clone_and_swap(data,y,y-size)
-        res.append(up)
-    if y + size < constant.NUMBER_OF_TILES:
-        down = clone_and_swap(data,y,y+size)
-        res.append(down)
+        up = clone_and_swap(state, y, y - size)
+        res.append((up, y - size))
+    if y + size < number_of_tiles:
+        down = clone_and_swap(state, y, y + size)
+        res.append((down, y + size))
 
     return res
 
 
-def search(path, g, threshold):
-    state = list(path.keys())[-1]
-    f = g + manhattan_heuristic(state)
+def search(path, g, threshold, goal_state, number_of_tiles, size, y):
+    state = path[0]
+    f = g + manhattan_heuristic(state, goal_state, number_of_tiles, size)
 
     if f > threshold:
         return f
-    if state == constant.GOAL_STATE:
+    if state == goal_state:
         return True
 
     minimum = float('inf')
-    for n in nextnodes(state):
-        if n not in path:
-            path[n] = None
-            tmp = search(path, g + 1, threshold)
+    nodes = nextnodes(state, number_of_tiles, size, y)
+    for node, zero in nodes:
+        if node not in path:
+            path.appendleft(node)
+            tmp = search(path, g + 1, threshold, goal_state, number_of_tiles, size, zero)
             if tmp == True:
                 return True
             if tmp < minimum:
                 minimum = tmp
-            path.popitem()
+            path.popleft()
 
     return minimum
 
 
-def solve(initial_state):
-    print(f'GOAL_STATE = {constant.GOAL_STATE}')
+def solve(initial_state, goal_state, number_of_tiles, size):
+    print(f'GOAL_STATE = {goal_state}')
     print(f'INITIAL STATE = {initial_state}')
     print()
 
-    threshold = manhattan_heuristic(initial_state)
-    # TODO check if deque is not faster
-    path = {initial_state: None}
+    y = initial_state.index(0)
+    threshold = manhattan_heuristic(initial_state, goal_state, number_of_tiles, size)
+    path = deque([initial_state])
 
     while 1:
-        tmp = search(path, 0, threshold)
+        tmp = search(path, 0, threshold, goal_state, number_of_tiles, size, y)
         if tmp == True:
             print(f"GOOD!")
-            return path.keys()
+            return path
         elif tmp == float('inf'):
             print(f"WRONG!")
             return False
