@@ -7,6 +7,7 @@ from test2 import linear_conflict_heuristic
 
 def manhattan_heuristic(state, goal_state, number_of_tiles, size):
     distance = 0
+
     for i in range(number_of_tiles):
         if state[i] != goal_state[i] and state[i] != 0:
             ci = goal_state.index(state[i])
@@ -17,11 +18,44 @@ def manhattan_heuristic(state, goal_state, number_of_tiles, size):
     return distance
 
 
+def count_conflicts(row, goal_row, size):
+    conflicts = 0
+
+    for i, (tile, goal_tile) in enumerate(zip(row, goal_row)):
+        if tile != goal_tile and tile != 0 and tile in goal_row:
+
+            index = goal_row.index(tile)
+            print(f"tile={tile}({i})->({index})")
+            print(f"are anything in {row[index:i]} in {goal_row[i:index]}")
+
+            for r in row[index:i]:  #  here inverse index and i
+                if r in goal_row[i:index]: #  here inverse index and i
+                    print("conflicts")
+
+
+    return conflicts
+
+
+
+def linear_heuristic(state, goal_state, number_of_tiles, size):
+    distance = 0
+
+    for i in range(size):
+        # columns
+        distance += count_conflicts(state[i::size], goal_state[i::size], size)
+        # rows
+        distance += count_conflicts(state[i * size:(i + 1) * size], goal_state[i * size:(i + 1) * size], size)
+        print()
+
+    return distance
+
+
 def clone_and_swap(data, y0, y1):
     clone = list(data)
     tmp = clone[y0]
     clone[y0] = clone[y1]
     clone[y1] = tmp
+
     return tuple(clone)
 
 
@@ -55,6 +89,7 @@ def search(path, g, threshold, goal_state, number_of_tiles, size, y):
 
     minimum = float('inf')
     nodes = nextnodes(state, number_of_tiles, size, y)
+
     for node, zero in nodes:
         if node not in path:
             path.appendleft(node)
@@ -72,6 +107,9 @@ def solve(initial_state, goal_state, number_of_tiles, size):
     print(f'GOAL_STATE = {goal_state}')
     print(f'INITIAL STATE = {initial_state}')
     print()
+
+    print(linear_heuristic(initial_state, goal_state, number_of_tiles, size))
+    exit()
 
     y = initial_state.index(0)
     threshold = manhattan_heuristic(initial_state, goal_state, number_of_tiles, size)
