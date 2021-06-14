@@ -25,26 +25,35 @@ def count_conflicts(row, goal_row):
         if tile != goal_tile and tile != 0 and tile in goal_row:
 
             index = goal_row.index(tile)
+            # print()
             # print(f"tile={tile}({i})->({index})")
             if i > index:
                 # print(f"1- are anything in {row[index:i]} in {goal_row[index + 1:i + 1]}")
-                # for r in row[index:i]:
-                #     if r in goal_row[index + 1:i + 1]:
-                #         print("CONFLICT!")
-                conflicts += len(set(row[i:index]) & set(goal_row[i + 1:index + 1]))
+                for r in row[index:i]:
+                    if r in goal_row[index + 1:i + 1]:
+                        # print("CONFLICT!")
+                        conflicts += 1
+                # if len(set(row[i:index]) & set(goal_row[i + 1:index + 1])) > 0:
+                #     conflicts += len(set(row[i:index]) & set(goal_row[i + 1:index + 1]))
+                #     print(set(row[i:index]) & set(goal_row[i + 1:index + 1]))
+                #     print(f"CONFLICT")
             else:
                 # print(f"2- are anything in {row[i + 1:index + 1]} in {goal_row[i:index]}")
-                # for r in row[i + 1:index + 1]:
-                #     if r in goal_row[i:index]:
-                #         print("CONFLICT!")
-                conflicts += len(set(row[i + 1:index + 1]) & set(goal_row[i:index]))
+                for r in row[i + 1:index + 1]:
+                    if r in goal_row[i:index]:
+                        # print("CONFLICT!")
+                        conflicts += 1
+                # if len(set(row[i + 1:index + 1]) & set(goal_row[i:index])) > 0:
+                #     conflicts += len(set(row[i + 1:index + 1]) & set(goal_row[i:index]))
+                #     print(set(row[i + 1:index + 1]) & set(goal_row[i:index]))
+                #     print(f"CONFLICT")
 
     return conflicts * 2
 
 
-
 def linear_heuristic(state, goal_state, number_of_tiles, size):
     distance = manhattan_heuristic(state, goal_state, number_of_tiles, size)
+    # print(f"conflicts={distance}")
 
     for i in range(size):
         # columns
@@ -52,7 +61,8 @@ def linear_heuristic(state, goal_state, number_of_tiles, size):
         # rows
         distance += count_conflicts(state[i * size:(i + 1) * size], goal_state[i * size:(i + 1) * size])
 
-    # print(f"distance={distance}")
+    # print(f"conflicts={distance}")
+    # exit()
     return distance
 
 
