@@ -18,51 +18,38 @@ def manhattan_heuristic(state, goal_state, number_of_tiles, size):
     return distance
 
 
-def count_conflicts(row, goal_row):
+def count_conflicts(row, goal_row, size):
     conflicts = 0
-
-    for i, (tile, goal_tile) in enumerate(zip(row, goal_row)):
-        if tile != goal_tile and tile != 0 and tile in goal_row:
+    for i, tile in enumerate(row):
+        if tile != 0 and tile in goal_row:
 
             index = goal_row.index(tile)
-            # print()
-            # print(f"tile={tile}({i})->({index})")
-            if i > index:
-                # print(f"1- are anything in {row[index:i]} in {goal_row[index + 1:i + 1]}")
-                for r in row[index:i]:
-                    if r in goal_row[index + 1:i + 1]:
-                        # print("CONFLICT!")
-                        conflicts += 1
-                # if len(set(row[i:index]) & set(goal_row[i + 1:index + 1])) > 0:
-                #     conflicts += len(set(row[i:index]) & set(goal_row[i + 1:index + 1]))
-                #     print(set(row[i:index]) & set(goal_row[i + 1:index + 1]))
-                #     print(f"CONFLICT")
-            else:
-                # print(f"2- are anything in {row[i + 1:index + 1]} in {goal_row[i:index]}")
-                for r in row[i + 1:index + 1]:
-                    if r in goal_row[i:index]:
-                        # print("CONFLICT!")
-                        conflicts += 1
-                # if len(set(row[i + 1:index + 1]) & set(goal_row[i:index])) > 0:
-                #     conflicts += len(set(row[i + 1:index + 1]) & set(goal_row[i:index]))
-                #     print(set(row[i + 1:index + 1]) & set(goal_row[i:index]))
-                #     print(f"CONFLICT")
+            print()
+            print(f"tile={tile}({i})->({index})")
 
-    return conflicts * 2
+            # left
+            conflicts += len(set(row[0:i]) & set(goal_row[index + 1:size]) - {0})
+            # right
+            conflicts += len(set(row[i + 1:size]) & set(goal_row[0:index]) - {0})
+
+            print(f"gauche={row[0:i]}   goal={goal_row[index + 1:size]}")
+            print(f"droite={row[i + 1:size]}   goal={goal_row[0:index]}")
+            print(set(row[0:i]) & set(goal_row[index + 1:size]) - {0})
+            print(set(row[i + 1:size]) & set(goal_row[0:index]) - {0})
+
+    return conflicts
 
 
 def linear_heuristic(state, goal_state, number_of_tiles, size):
-    distance = manhattan_heuristic(state, goal_state, number_of_tiles, size)
-    # print(f"conflicts={distance}")
+    # distance = manhattan_heuristic(state, goal_state, number_of_tiles, size)
+    distance = 0
 
     for i in range(size):
         # columns
-        distance += count_conflicts(state[i::size], goal_state[i::size])
+        distance += count_conflicts(state[i::size], goal_state[i::size], size)
         # rows
-        distance += count_conflicts(state[i * size:(i + 1) * size], goal_state[i * size:(i + 1) * size])
+        distance += count_conflicts(state[i * size:(i + 1) * size], goal_state[i * size:(i + 1) * size], size)
 
-    # print(f"conflicts={distance}")
-    # exit()
     return distance
 
 
@@ -121,16 +108,14 @@ def search(path, g, threshold, goal_state, number_of_tiles, size, y):
 
 
 def solve(initial_state, goal_state, number_of_tiles, size):
-    print(f'GOAL_STATE = {goal_state}')
-    print(f'INITIAL STATE = {initial_state}')
-    print()
-
-    # print(linear_heuristic(initial_state, goal_state, number_of_tiles, size))
-    # exit()
+    # print(f'GOAL_STATE = {goal_state}')
+    # print(f'INITIAL STATE = {initial_state}')
 
     y = initial_state.index(0)
     # threshold = manhattan_heuristic(initial_state, goal_state, number_of_tiles, size)
     threshold = linear_heuristic(initial_state, goal_state, number_of_tiles, size)
+    print(f"RES={threshold}")
+    exit()
     path = deque([initial_state])
 
     while 1:
