@@ -3,6 +3,7 @@ import sys
 from solvability import puzzle_is_solvable
 from solver import solve
 import numpy as np
+from heuristics import heuristics
 
 from test2 import linear_conflict_heuristic
 
@@ -96,7 +97,14 @@ def main():
 		# TODO check if puzzle is solvable
 		# if puzzle_is_solvable(initial_state):
 		if True:				# to be deleted
-			path = solve(initial_state, goal_state, number_of_tiles, size)
+			heuristic = heuristics['conflicts']
+			path, node_count = solve(heuristic, initial_state, goal_state, number_of_tiles, size)
+			print(f"complexity in time: {node_count}")
+			print(f"complexity in space: {len(path)}")
+			print(f"number of moves: {len(path) - 1}")
+			print(f"initial state to final state:")
+			for p in reversed(path):
+				print(f"{p}")
 		# else:
 		# 	error('unsolvable')
 	else:

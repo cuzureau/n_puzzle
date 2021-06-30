@@ -5,54 +5,6 @@ import numpy as np
 from test2 import linear_conflict_heuristic
 
 
-def manhattan_heuristic(state, goal_state, number_of_tiles, size):
-    distance = 0
-
-    for i in range(number_of_tiles):
-        if state[i] != goal_state[i] and state[i] != 0:
-            ci = goal_state.index(state[i])
-            y = (i // size) - (ci // size)
-            x = (i % size) - (ci % size)
-            distance += abs(y) + abs(x)
-
-    return distance
-
-
-def count_conflicts(row, goal_row, size):
-    conflicts = 0
-    for i, tile in enumerate(row):
-        if tile != 0 and tile in goal_row:
-
-            index = goal_row.index(tile)
-            print()
-            print(f"tile={tile}({i})->({index})")
-
-            # left
-            conflicts += len(set(row[0:i]) & set(goal_row[index + 1:size]) - {0})
-            # right
-            conflicts += len(set(row[i + 1:size]) & set(goal_row[0:index]) - {0})
-
-            print(f"gauche={row[0:i]}   goal={goal_row[index + 1:size]}")
-            print(f"droite={row[i + 1:size]}   goal={goal_row[0:index]}")
-            print(set(row[0:i]) & set(goal_row[index + 1:size]) - {0})
-            print(set(row[i + 1:size]) & set(goal_row[0:index]) - {0})
-
-    return conflicts
-
-
-def linear_heuristic(state, goal_state, number_of_tiles, size):
-    # distance = manhattan_heuristic(state, goal_state, number_of_tiles, size)
-    distance = 0
-
-    for i in range(size):
-        # columns
-        distance += count_conflicts(state[i::size], goal_state[i::size], size)
-        # rows
-        distance += count_conflicts(state[i * size:(i + 1) * size], goal_state[i * size:(i + 1) * size], size)
-
-    return distance
-
-
 def clone_and_swap(data, y0, y1):
     clone = list(data)
     tmp = clone[y0]
@@ -62,68 +14,64 @@ def clone_and_swap(data, y0, y1):
     return tuple(clone)
 
 
-def nextnodes(state, number_of_tiles, size, y):
+def nextnodes(state, number_of_tiles, size):
     res = []
+    y = state.index(0)
 
     if y % size > 0:
         left = clone_and_swap(state, y, y - 1)
-        res.append((left, y - 1))
+        res.append(left)
     if y % size + 1 < size:
         right = clone_and_swap(state, y, y + 1)
-        res.append((right, y + 1))
+        res.append(right)
     if y - size >= 0:
         up = clone_and_swap(state, y, y - size)
-        res.append((up, y - size))
+        res.append(up)
     if y + size < number_of_tiles:
         down = clone_and_swap(state, y, y + size)
-        res.append((down, y + size))
+        res.append(down)
 
     return res
 
 
-def search(path, g, threshold, goal_state, number_of_tiles, size, y):
+def search(heuristic, path, g, threshold, goal_state, number_of_tiles, size, node_count):
     state = path[0]
-    # f = g + manhattan_heuristic(state, goal_state, number_of_tiles, size)
-    f = g + linear_heuristic(state, goal_state, number_of_tiles, size)
+    f = g + heuristic(state, goal_state, number_of_tiles, size)
+    node_count += 1
 
     if f > threshold:
-        return f
+        return f, node_count
     if state == goal_state:
-        return True
+        return True, node_count
 
     minimum = float('inf')
-    nodes = nextnodes(state, number_of_tiles, size, y)
+    nodes = nextnodes(state, number_of_tiles, size)
 
-    for node, zero in nodes:
+    for node in nodes:
         if node not in path:
             path.appendleft(node)
-            tmp = search(path, g + 1, threshold, goal_state, number_of_tiles, size, zero)
+            tmp, node_count = search(heuristic, path, g + 1, threshold, goal_state, number_of_tiles, size, node_count)
             if tmp == True:
-                return True
+                return True, node_count
             if tmp < minimum:
                 minimum = tmp
             path.popleft()
 
-    return minimum
+    return minimum, node_count
 
 
-def solve(initial_state, goal_state, number_of_tiles, size):
-    # print(f'GOAL_STATE = {goal_state}')
-    # print(f'INITIAL STATE = {initial_state}')
+def solve(heuristic, initial_state, goal_state, number_of_tiles, size):
 
-    y = initial_state.index(0)
-    # threshold = manhattan_heuristic(initial_state, goal_state, number_of_tiles, size)
-    threshold = linear_heuristic(initial_state, goal_state, number_of_tiles, size)
-    print(f"RES={threshold}")
-    exit()
+    threshold = heuristic(initial_state, goal_state, number_of_tiles, size)
     path = deque([initial_state])
+    node_count = 0
 
     while 1:
-        tmp = search(path, 0, threshold, goal_state, number_of_tiles, size, y)
+        tmp, node_count = search(heuristic, path, 0, threshold, goal_state, number_of_tiles, size, node_count)
         if tmp == True:
             print(f"GOOD!")
-            return path
+            return path, node_count
         elif tmp == float('inf'):
             print(f"WRONG!")
-            return False
+            return False, node_count
         threshold = tmp
