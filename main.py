@@ -1,12 +1,9 @@
-import re
 import sys
 from solvability import puzzle_is_solvable
 from solver import solve
 from heuristics import heuristics
-from parser import is_input
+from parser import parser
 
-
-from test2 import linear_conflict_heuristic
 
 def define_goal_state(length):
 	m = [[0] * length for i in range(length)]
@@ -35,33 +32,6 @@ def board_is_valid(board, size):
 		return False
 
 
-def parse_input():
-	try:
-		file = open(sys.argv[1], 'r')
-	except:
-		error('open')
-
-	file = [line.strip().split('#')[0] for line in file]
-	file = [line for line in file if len(line) > 0]
-
-	# print(f"PARSE")
-	# tic = time.time()
-	board = []
-	size = int(file[0][0])		# TODO max size should be 9
-	for fi in file[1:]:
-		fi = re.findall('[0-9]+', fi)
-		for f in fi:
-			board.append(int(f))
-	# print(f'{tuple(board)}\n{(time.time() - tic) * 1000}')
-	# exit()
-
-	# TODO check if board is valid
-	# if board_is_valid(board, puzzle_size) == False:
-	# 	error('invalid')
-
-	return size, tuple(board)
-
-
 def error(name):
 	if name == 'open':
 		print(f"Error:\n\tfile '{sys.argv[1]}' cannot be open")
@@ -73,12 +43,7 @@ def error(name):
 
 
 def main():
-	data, args = is_input()
-	if data:
-		size, initial_state = parse_input(data)
-	else:
-		size = 3
-		initial_state = generate_board(size)
+	initial_state, size, heuristic = parser()
 
 	goal_state = define_goal_state(size)
 	if puzzle_is_solvable(initial_state, goal_state, size):
