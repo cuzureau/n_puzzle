@@ -1,4 +1,27 @@
 from collections import deque
+from heuristics import heuristics
+
+
+class Node:
+    def __init__(self, state, heuristic):
+        self.state = state
+        self.heuristic = heuristic
+
+    def __str__(self):
+        return f"state=\n{self.state}\nheuristic={int(self.heuristic)}"
+
+    def __eq__(self, other):
+        return self.state == other
+    #
+    # def __repr__(self):
+    #     return f"state=\n{self.state}\nheuristic={int(self.heuristic)}"
+
+    def __hash__(self):
+        return hash(self.state.tobytes())
+
+
+def customSort(node):
+    return node.heuristic
 
 
 def clone_and_swap(data, y0, y1):
@@ -10,23 +33,24 @@ def clone_and_swap(data, y0, y1):
     return tuple(clone)
 
 
-def nextnodes(state, size):
+def nextnodes(state, goal_state, size, heuristic):
     res = []
     y = state.index(0)
 
     if y % size > 0:
         left = clone_and_swap(state, y, y - 1)
-        res.append(left)
+        res.append(Node(left, heuristic(left, goal_state, size)))
     if y % size + 1 < size:
         right = clone_and_swap(state, y, y + 1)
-        res.append(right)
+        res.append(Node(right, heuristic(right, goal_state, size)))
     if y - size >= 0:
         up = clone_and_swap(state, y, y - size)
-        res.append(up)
+        res.append(Node(up, heuristic(up, goal_state, size)))
     if y + size < size * size:
         down = clone_and_swap(state, y, y + size)
-        res.append(down)
+        res.append(Node(down, heuristic(down, goal_state, size)))
 
+    res.sort(key=customSort)
     return res
 
 
@@ -41,8 +65,7 @@ def search(heuristic, path, g, threshold, goal_state, size, node_count):
         return True, node_count
 
     minimum = float('inf')
-    nodes = nextnodes(state, size)
-
+    nodes = nextnodes(state, goal_state, size, heuristic)
     for node in nodes:
         if node not in path:
             path.appendleft(node)
