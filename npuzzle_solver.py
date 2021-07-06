@@ -2,8 +2,9 @@ import re
 import sys
 from solvability import puzzle_is_solvable
 from solver import solve
-import numpy as np
 from heuristics import heuristics
+from parser import is_input
+
 
 from test2 import linear_conflict_heuristic
 
@@ -40,8 +41,8 @@ def parse_input():
 	except:
 		error('open')
 
-	file = [line.strip().split('#')[0] for line in file] 	# remove comments
-	file = [line for line in file if len(line) > 0]			# remove empty lines
+	file = [line.strip().split('#')[0] for line in file]
+	file = [line for line in file if len(line) > 0]
 
 	# print(f"PARSE")
 	# tic = time.time()
@@ -62,9 +63,7 @@ def parse_input():
 
 
 def error(name):
-	if name == 'usage':
-		print(f"Usage:\n\tpython3 {sys.argv[0]} <puzzle_file>")
-	elif name == 'open':
+	if name == 'open':
 		print(f"Error:\n\tfile '{sys.argv[1]}' cannot be open")
 	elif name == 'invalid':
 		print(f"Error:\n\tthe board is not valid")
@@ -73,42 +72,26 @@ def error(name):
 	exit()
 
 
-def generate_board():
-	print("generate random board")
-
-	# ADD DETAILS
-	arr = np.arange(9).reshape((3, 3))
-	arr2 = np.random.permutation(arr)
-
-	return arr2
-
-
 def main():
-	if 1 <= len(sys.argv) <= 2:
-		# TODO board generation
-		# if len(sys.argv) == 1:
-		# 	initial_state = generate_board()
-		# else:
-		size, initial_state = parse_input()
-		goal_state = define_goal_state(size)
-		number_of_tiles = size * size
-
-
-		# TODO check if puzzle is solvable
-		# if puzzle_is_solvable(initial_state):
-		if True:				# to be deleted
-			heuristic = heuristics['conflicts']
-			path, node_count = solve(heuristic, initial_state, goal_state, number_of_tiles, size)
-			print(f"complexity in time: {node_count}")
-			print(f"complexity in space: {len(path)}")
-			print(f"number of moves: {len(path) - 1}")
-			print(f"initial state to final state:")
-			for p in reversed(path):
-				print(f"{p}")
-		# else:
-		# 	error('unsolvable')
+	data, args = is_input()
+	if data:
+		size, initial_state = parse_input(data)
 	else:
-		error('usage')
+		size = 3
+		initial_state = generate_board(size)
+
+	goal_state = define_goal_state(size)
+	if puzzle_is_solvable(initial_state, goal_state, size):
+		heuristic = heuristics['conflicts']
+		path, node_count = solve(heuristic, initial_state, goal_state, size)
+		print(f"complexity in time: {node_count}")
+		print(f"complexity in space: {len(path)}")
+		print(f"number of moves: {len(path) - 1}")
+		print(f"initial state to final state:")
+		for p in reversed(path):
+			print(f"{p}")
+	else:
+		error('unsolvable')
 
 
 if __name__ == '__main__':

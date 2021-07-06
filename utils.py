@@ -1,29 +1,15 @@
-import numpy as np
 
 # a verifier
 def is_even(number):
 	return number % 2
 
-def count_transpositions(state1, state2):
-	tmp = np.copy(state1)
-	transpositions = 0
 
-	for number in range(len(state1) ** 2):
-		position1 = np.where(tmp == number)
-		position2 = np.where(state2 == number)
-		if position1 != position2:
-			tmp[position1], tmp[position2] = tmp[position2], tmp[position1]
-			transpositions += 1
+def count_distance(number, state1, state2, size):
+	position1 = state1.index(number)
+	position2 = state2.index(number)
 
-	return transpositions
+	return manhattan_distance(position1, position2, size)
 
 
-def count_distance(number, state1, state2):
-	position1 = np.where(state1 == number)
-	position2 = np.where(state2 == number)
-
-	return manhattan_distance(position1, position2)
-
-
-def manhattan_distance(a, b):
-	return abs(b[0] - a[0]) + abs(b[1] - a[1])
+def manhattan_distance(a, b, size):
+	return abs(b // size - a // size) + abs(b % size - a % size)

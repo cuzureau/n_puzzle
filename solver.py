@@ -60,7 +60,7 @@ def search(heuristic, path, g, threshold, goal_state, number_of_tiles, size, nod
     return minimum, node_count
 
 
-def solve(heuristic, initial_state, goal_state, number_of_tiles, size):
+def solve(heuristic, initial_state, goal_state, size):
 
     threshold = heuristic(initial_state, goal_state, number_of_tiles, size)
     path = deque([initial_state])
