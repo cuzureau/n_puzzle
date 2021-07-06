@@ -62,7 +62,7 @@ def define_state(data):
     return tuple(board)
 
 
-def parser():
+def parse():
     p = argparse.ArgumentParser(description='n_puzzle by @cuzureau')
     p.add_argument('-heur', help='heuristic function', choices=list(heuristics.keys()), default='manhattan')
     p.add_argument('file', help='input file', nargs='?', type=argparse.FileType('r'))
@@ -77,6 +77,6 @@ def parser():
             initial_state = define_state(data)
         else:
             print('Sadly... puzzle initial state is invalid.')
-            return None
+            size, initial_state = None, None
 
     return initial_state, size, heuristics[args.heur]

@@ -1,4 +1,4 @@
-def hamming_heuristic(state, goal_state):
+def hamming_heuristic(state, goal_state, size):
     res = 0
 
     for s, g in zip(state, goal_state):
@@ -7,10 +7,11 @@ def hamming_heuristic(state, goal_state):
 
     return res
 
-def manhattan_heuristic(state, goal_state, number_of_tiles, size):
+
+def manhattan_heuristic(state, goal_state, size):
     distance = 0
 
-    for i in range(number_of_tiles):
+    for i in range(size * size):
         if state[i] != goal_state[i] and state[i] != 0:
             ci = goal_state.index(state[i])
             y = (i // size) - (ci // size)
@@ -44,8 +45,8 @@ def count_conflicts(row, goal_row, size, ans=0):
         return count_conflicts(row, goal_row, size, ans)
 
 
-def linear_heuristic(state, goal_state, number_of_tiles, size):
-    distance = manhattan_heuristic(state, goal_state, number_of_tiles, size)
+def linear_heuristic(state, goal_state, size):
+    distance = manhattan_heuristic(state, goal_state, size)
 
     for i in range(size):
         # row
@@ -57,7 +58,7 @@ def linear_heuristic(state, goal_state, number_of_tiles, size):
 
 
 heuristics = {
-    'hamming':      hamming_heuristic,
-    'manhattan':    manhattan_heuristic,
-    'conflicts':    linear_heuristic,
+    'hamming': hamming_heuristic,
+    'manhattan': manhattan_heuristic,
+    'linear': linear_heuristic,
 }

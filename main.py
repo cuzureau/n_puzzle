@@ -1,26 +1,21 @@
 from solvability import puzzle_is_solvable
-from solver import solve
-from heuristics import heuristics
-from parser import parser
 from utils import define_goal_state
+from solver import solve
+from parser import parse
+from printer import display
 
 
 def main():
-    try:
-        initial_state, size, heuristic = parser()
-    except TypeError:
+    initial_state, size, heuristic = parse()
+    if not all([initial_state, size, heuristic]):
         exit()
 
     goal_state = define_goal_state(size)
     if puzzle_is_solvable(initial_state, goal_state, size):
-        heuristic = heuristics['conflicts']
         path, node_count = solve(heuristic, initial_state, goal_state, size)
-        print(f"complexity in time: {node_count}")
-        print(f"complexity in space: {len(path)}")
-        print(f"number of moves: {len(path) - 1}")
-        print(f"initial state to final state:")
-        for p in reversed(path):
-            print(f"{p}")
+        if not all([path, node_count]):
+            exit()
+        display(path, node_count)
     else:
         print('Sadly... puzzle initial state is unsolvable.')
 
