@@ -1,3 +1,7 @@
+def uniform_cost(state, goal_state, size):
+    return 0
+
+
 def hamming_heuristic(state, goal_state, size):
     res = 0
 
@@ -61,4 +65,5 @@ heuristics = {
     'hamming': hamming_heuristic,
     'manhattan': manhattan_heuristic,
     'linear': linear_heuristic,
+    'uniform': uniform_cost,
 }
