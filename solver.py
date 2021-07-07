@@ -8,10 +8,10 @@ class Node:
         self.heuristic = heuristic
 
     def __str__(self):
-        return f"state=\n{self.state}\nheuristic={int(self.heuristic)}"
+        return f"{self.state}"
 
-    def __eq__(self, other):
-        return self.state == other
+    # def __eq__(self, other):
+    #     return self.state == other
     #
     # def __repr__(self):
     #     return f"state=\n{self.state}\nheuristic={int(self.heuristic)}"
@@ -20,7 +20,7 @@ class Node:
         return hash(self.state.tobytes())
 
 
-def customSort(node):
+def custom_sort(node):
     return node.heuristic
 
 
@@ -33,42 +33,42 @@ def clone_and_swap(data, y0, y1):
     return tuple(clone)
 
 
-def nextnodes(state, goal_state, size, heuristic):
+def nextnodes(node, goal_state, size, heuristic):
     res = []
-    y = state.index(0)
+    y = node.state.index(0)
 
     if y % size > 0:
-        left = clone_and_swap(state, y, y - 1)
+        left = clone_and_swap(node.state, y, y - 1)
         res.append(Node(left, heuristic(left, goal_state, size)))
     if y % size + 1 < size:
-        right = clone_and_swap(state, y, y + 1)
+        right = clone_and_swap(node.state, y, y + 1)
         res.append(Node(right, heuristic(right, goal_state, size)))
     if y - size >= 0:
-        up = clone_and_swap(state, y, y - size)
+        up = clone_and_swap(node.state, y, y - size)
         res.append(Node(up, heuristic(up, goal_state, size)))
     if y + size < size * size:
-        down = clone_and_swap(state, y, y + size)
+        down = clone_and_swap(node.state, y, y + size)
         res.append(Node(down, heuristic(down, goal_state, size)))
 
-    res.sort(key=customSort)
+    res.sort(key=custom_sort)
     return res
 
 
 def search(heuristic, path, g, threshold, goal_state, size, node_count):
-    state = path[0]
-    f = g + heuristic(state, goal_state, size)
+    current_node = path[0]
+    f = g + current_node.heuristic
     node_count += 1
 
     if f > threshold:
         return f, node_count
-    if state == goal_state:
+    if current_node.state == goal_state:
         return True, node_count
 
     minimum = float('inf')
-    nodes = nextnodes(state, goal_state, size, heuristic)
-    for node in nodes:
-        if node not in path:
-            path.appendleft(node)
+    next_nodes = nextnodes(current_node, goal_state, size, heuristic)
+    for next_node in next_nodes:
+        if next_node not in path:
+            path.appendleft(next_node)
             tmp, node_count = search(heuristic, path, g + 1, threshold, goal_state, size, node_count)
             if tmp is True:
                 return True, node_count
@@ -81,7 +81,8 @@ def search(heuristic, path, g, threshold, goal_state, size, node_count):
 
 def solve(heuristic, initial_state, goal_state, size):
     threshold = heuristic(initial_state, goal_state, size)
-    path = deque([initial_state])
+    initial_node = Node(initial_state, threshold)
+    path = deque([initial_node])
     node_count = 0
 
     while 1:
