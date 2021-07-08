@@ -1,5 +1,6 @@
 import argparse
 from heuristics import heuristics
+from algorithms import algorithms
 import numpy as np
 import re
 
@@ -64,7 +65,9 @@ def define_state(data):
 
 def parse():
     p = argparse.ArgumentParser(description='n_puzzle by @cuzureau')
-    p.add_argument('-heur', help='heuristic function', choices=list(heuristics.keys()), default='manhattan')
+    p.add_argument('-a', help='pathfinding algorithm (IDA* by default)', choices=('IDA*', 'WIDA*', '+DWIDA*', '-DWIDA*'), default='WIDA*')
+    p.add_argument('-f', help='heuristic function (manhattan by default)', choices=heuristics.keys(), default='linear')
+    p.add_argument('-w', help='weight (only for weighted algorithms ; size of the puzzle by default)', type=int)
     p.add_argument('file', help='input file', nargs='?', type=argparse.FileType('r'))
     args = p.parse_args()
 
@@ -78,5 +81,9 @@ def parse():
         else:
             print('Sadly... puzzle initial state is invalid.')
             size, initial_state = None, None
+    if not args.w:
+        weight = size
+    else:
+        weight = args.w
 
-    return initial_state, size, heuristics[args.heur]
+    return initial_state, size, algorithms[args.a], heuristics[args.f], weight

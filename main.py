@@ -6,13 +6,13 @@ from printer import display
 
 
 def main():
-    initial_state, size, heuristic = parse()
-    if not all([initial_state, size, heuristic]):
+    initial_state, size, algorithm, heuristic, weight = parse()
+    if not all([initial_state, size, algorithm, heuristic, weight]):
         exit()
 
     goal_state = define_goal_state(size)
     if puzzle_is_solvable(initial_state, goal_state, size):
-        path, node_count = solve(heuristic, initial_state, goal_state, size)
+        path, node_count = solve(initial_state, goal_state, size, algorithm, heuristic, weight)
         if not all([path, node_count]):
             exit()
         display(path, node_count)
