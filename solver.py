@@ -58,16 +58,33 @@ def search(heuristic, path, g, threshold, goal_state, size, node_count, algorith
 
 
 class Node():
-    def __init__(self, state, heuristic, count):
+    def __init__(self, state, heuristic, count, parent):
         self.state = state
         self.heuristic = heuristic
         self.count = count
+        self.parent = parent
+        self.f = heuristic + count
 
     def __str__(self):
-        return f"state=\n{self.state}"
+        return f"{self.state}(h={self.heuristic})"
 
-    # def __repr__(self):
-    # 	return f"state=\n{self.state}"
+    def __lt__(self, other):
+        return self.f < other.f
+
+    # def __gt__(self, other):
+    #     if isinstance(other, Number):
+    #         return self.value > other.value
+    #     else:
+    #         raise E.Error(self, '>', other)
+    #
+    # def __eq__(self, other):
+    #     if isinstance(other, Number):
+    #         return (self.value == other.value)
+    #     else:
+    #         raise E.Error(self, '==', other)
+
+    def __repr__(self):
+    	return f"{self.state}(h={self.heuristic})"
 
     # def __eq__(self, other):
     # 	return np.array_equal(self.state, other.state)
@@ -76,36 +93,38 @@ class Node():
     # 	return hash(self.state.tobytes())
 
 
-def no_better_node_present_in_opened(node, opened):
-    for o in opened:
-        if o.state == node.state and o.count < node.count:
-            return False
-        elif o.state == node.state and o.count > node.count:
-            return True
-    return False
-
-
-
-
 def a_star_algorithm(initial_state, goal_state, size, heuristic):
-    initial_node = Node(initial_state, heuristic(initial_state, goal_state, size), 0)
-    opened = [initial_node]
-    closed = []
-    success = False
+    from heapq import heappush, heappop, heapify
 
-    while opened and not success:
-        current_node = opened[-1]
+    initial_node = Node(initial_state, heuristic(initial_state, goal_state, size), 0, None)
+    open_list = [initial_node]
+    close_list = {}
+    heapify(open_list)
+
+    while open_list:
+        current_node = heappop(open_list)
+
         if current_node.state == goal_state:
-            return closed
+            path = [current_node.state]
+            parent = current_node.parent
+            while parent is not None:
+                path.append(parent)
+                parent = close_list[parent.state]
+
+            print(len(path))
+            for p in path:
+                print(p)
+            return path
+        else:
+            close_list[current_node.state] = current_node.parent
 
         nodes = nextnodes(current_node.state, size)
         for node in nodes:
-            if node not in closed:
-                print("yooo")
-        #     if node not in closed or no_better_node_present_in_opened(node, opened):
-        #         node.count = current_node.count + 1
-
-
+            h = heuristic(node, goal_state, size)
+            g = current_node.count + 1
+            if node not in open_list:
+                t_node = Node(node, h, g, current_node)
+                heappush(open_list, t_node)
 
 
 
